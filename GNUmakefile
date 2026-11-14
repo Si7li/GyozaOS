@@ -2,8 +2,7 @@
 .SUFFIXES:
 
 # Default user QEMU flags. These are appended to the QEMU command calls.
-QEMUFLAGS := -m 2G -serial stdio -s -no-reboot -no-shutdown
-
+QEMUFLAGS := -m 2G -serial stdio -s -no-reboot -no-shutdown -display sdl
 override IMAGE_NAME := template
 
 # Toolchain for building the 'limine' executable for the host.

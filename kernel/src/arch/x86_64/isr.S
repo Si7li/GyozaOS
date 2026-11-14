@@ -55,6 +55,24 @@ ISR_ERR    29    // VMM communication exception
 ISR_ERR    30    // security exception
 ISR_NO_ERR 31    // reserved
 
+// Hardware IRQs 0-15 from the PIC, remapped to 32-47. None has an error code.
+ISR_NO_ERR 32    // IRQ 0:  timer (PIT)
+ISR_NO_ERR 33    // IRQ 1:  keyboard
+ISR_NO_ERR 34    // IRQ 2:  cascade (the slave PIC, never fires itself)
+ISR_NO_ERR 35    // IRQ 3:  COM2
+ISR_NO_ERR 36    // IRQ 4:  COM1
+ISR_NO_ERR 37    // IRQ 5:  LPT2 / free
+ISR_NO_ERR 38    // IRQ 6:  floppy
+ISR_NO_ERR 39    // IRQ 7:  LPT1 / spurious
+ISR_NO_ERR 40    // IRQ 8:  real-time clock
+ISR_NO_ERR 41    // IRQ 9:  free
+ISR_NO_ERR 42    // IRQ 10: free
+ISR_NO_ERR 43    // IRQ 11: free
+ISR_NO_ERR 44    // IRQ 12: PS/2 mouse
+ISR_NO_ERR 45    // IRQ 13: FPU
+ISR_NO_ERR 46    // IRQ 14: primary ATA disk
+ISR_NO_ERR 47    // IRQ 15: secondary ATA disk / spurious
+
 // Shared by every stub. Saves the 15 registers, calls C, restores, returns.
 isr_common:
     // Push order must match interrupt_frame_t (reversed) in idt.h.
@@ -110,6 +128,10 @@ isr_stub_table:
     .quad isr_stub_20, isr_stub_21, isr_stub_22, isr_stub_23
     .quad isr_stub_24, isr_stub_25, isr_stub_26, isr_stub_27
     .quad isr_stub_28, isr_stub_29, isr_stub_30, isr_stub_31
+    .quad isr_stub_32, isr_stub_33, isr_stub_34, isr_stub_35
+    .quad isr_stub_36, isr_stub_37, isr_stub_38, isr_stub_39
+    .quad isr_stub_40, isr_stub_41, isr_stub_42, isr_stub_43
+    .quad isr_stub_44, isr_stub_45, isr_stub_46, isr_stub_47
 
 // Tells the linker this file doesn't need an executable stack.
 .section .note.GNU-stack, "", @progbits

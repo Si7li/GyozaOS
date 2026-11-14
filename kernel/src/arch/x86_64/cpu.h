@@ -63,4 +63,16 @@ static inline __attribute__((noreturn)) void halt_forever(void){
         asm volatile ("cli; hlt");
     }
 }
+
+// MSRs (model-specific registers) are CPU settings, read and written with
+// the special rdmsr/wrmsr instructions instead of ports or memory.
+static inline uint64_t rdmsr(uint32_t msr) {
+    uint32_t lo, hi;
+    asm volatile("rdmsr" : "=a"(lo), "=d"(hi) : "c"(msr));
+    return ((uint64_t)hi << 32) | lo;
+}
+
+static inline void wrmsr(uint32_t msr, uint64_t value) {
+    asm volatile("wrmsr" :: "c"(msr), "a"((uint32_t)value), "d"((uint32_t)(value >> 32)));
+}
 #endif

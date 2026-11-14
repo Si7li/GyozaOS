@@ -4,6 +4,7 @@
 #include <arch/x86_64/gdt.h>
 #include <lib/printf.h>
 #include <arch/x86_64/cpu.h>
+#include <arch/x86_64/pic.h>
 
 #define IDT_ENTRIES 256
 
@@ -54,8 +55,26 @@ static const char *exception_names[32] = {
     "Security exception",       "Reserved",
 };
 
+// One slot per hardware IRQ. NULL means "nobody handles this one yet".
+static irq_handler_t irq_handlers[16];
+
+void irq_register(uint8_t irq, irq_handler_t handler) {
+    if (irq < 16) {
+        irq_handlers[irq] = handler;
+    }
+}
+
 // Called by isr_common in isr.S for every interrupt.
 void interrupt_handler(interrupt_frame_t *f) {
+    // Hardware IRQs (32-47): run the driver's function, then tell the PIC we're done.
+    if (f->vector >= PIC_IRQ_BASE && f->vector < PIC_IRQ_BASE + 16) {
+        uint8_t irq = f->vector - PIC_IRQ_BASE;
+        if (irq_handlers[irq] != NULL) {
+            irq_handlers[irq](f);
+        }
+        pic_send_eoi(irq);
+        return;
+    }
     const char *name = f->vector < 32 ? exception_names[f->vector] : "Unknown";
 
     // Breakpoint (int3) is harmless: report it and go back to the code.
@@ -83,12 +102,12 @@ void interrupt_handler(interrupt_frame_t *f) {
     halt_forever();
 }
 
-// The table itself: 256 gates. We only fill the first 32 for now.
+// The table itself: 256 gates.  We fill the first 48: 32 exceptions + 16 IRQs for now.
 static idt_entry_t idt[IDT_ENTRIES] __attribute__((aligned(16)));
 static idtr_t      idtr;
 
-// The 32 stub addresses, defined in isr.S.
-extern uint64_t isr_stub_table[32];
+// The 48 stub addresses, defined in isr.S.
+extern uint64_t isr_stub_table[48];
 
 // Fill one gate so that interrupt `vector` jumps to `handler`.
 static void set_gate(int vector, uint64_t handler) {
@@ -104,7 +123,7 @@ static void set_gate(int vector, uint64_t handler) {
 }
 
 void idt_init(void) {
-    for (int v = 0; v < 32; v++) {
+    for (int v = 0; v < 48; v++) {
         set_gate(v, isr_stub_table[v]);
     }
 

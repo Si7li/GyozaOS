@@ -12,6 +12,10 @@
 
 #include <arch/x86_64/gdt.h>
 #include <arch/x86_64/idt.h>
+#include <arch/x86_64/pic.h>
+#include <arch/x86_64/cpu.h>
+#include <drivers/pit.h>
+#include <drivers/keyboard.h>
 
 // Set the base revision to 6, this is recommended as this is the latest
 // base revision described by the Limine boot protocol specification.
@@ -58,7 +62,14 @@ void kmain(void) {
     gdt_init();
     kprintf("gdt: loaded\n");
     idt_init();
-    kprintf("idt: loaded\n");;
+    kprintf("idt: loaded\n");
+    pic_init();
+    kprintf("pic: remapped\n");
+    pit_init(100);
+    kprintf("pit: 100 Hz\n");
+    keyboard_init();
+    kprintf("keyboard: ready\n");
+    
     // Ensure the bootloader actually understands our base revision (see spec).
     if (LIMINE_BASE_REVISION_SUPPORTED(limine_base_revision) == false) {
         serial_puts("kernel: framebuffer drawn, halting\n");
@@ -123,5 +134,15 @@ void kmain(void) {
     volatile int zero = 0;
     volatile int x = 10 / zero;
     #endif
+    sti();    // interrupts on: from here the timer ticks
+     kprintf("type something:\n");
+    for (;;) {
+        int c = keyboard_getchar();
+        if (c < 0) {
+            hlt();          // nothing yet: sleep until the next interrupt
+            continue;
+        }
+        kprintf("%c", c);
+    }
     hcf();
 }

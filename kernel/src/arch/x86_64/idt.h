@@ -22,6 +22,9 @@ typedef struct  __attribute__((packed)){
 _Static_assert(sizeof(interrupt_frame_t) == 176, "interrupt frame must be 176 bytes");
 
 void idt_init(void);
-
+// A driver's function for one hardware IRQ (0-15).
+typedef void (*irq_handler_t)(interrupt_frame_t *frame);
+// Ask for `handler` to be called whenever `irq` fires.
+void irq_register(uint8_t irq, irq_handler_t handler);
 #endif
 
