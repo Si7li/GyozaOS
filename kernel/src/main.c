@@ -92,6 +92,7 @@ void kmain(void) {
 
     kprintf_add_sink(console_putc);
     
+    #if 0
     // Color Debugging
     fill_rect(framebuffer->width/2 - 300,framebuffer->height/2 + 25,50,25,0xFFFF2E2E);
     fill_rect(framebuffer->width/2 - 250,framebuffer->height/2 + 25,50,25,0xFFFF5533);
@@ -103,6 +104,7 @@ void kmain(void) {
     fill_rect(framebuffer->width/2 +  50,framebuffer->height/2 + 25,50,25,0xFFD45959);
     fill_rect(framebuffer->width/2 + 100,framebuffer->height/2 + 25,50,25,0xFF808080);
     fill_rect(framebuffer->width/2 + 150,framebuffer->height/2 + 25,50,25,0xFF0D0D0D);
+    #endif
 
 
     kprintf("console: loaded\n");
