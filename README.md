@@ -49,8 +49,9 @@ What works today:
   per-IRQ handler registration and end-of-interrupt handling
 - **PIT timer** — programmable tick rate (100 Hz by default), a tick counter and
   a `hlt`-based millisecond sleep
-- **PS/2 keyboard** — scancode set 1 translated to characters (US layout, Shift
-  supported) and queued in a ring buffer between the IRQ handler and the kernel
+- **PS/2 keyboard** — scancode set 1 translated to characters (French AZERTY,
+  with Shift and AltGr) and queued in a ring buffer between the IRQ handler and
+  the kernel
 
 ## Building
 
