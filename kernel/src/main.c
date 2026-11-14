@@ -11,6 +11,7 @@
 #include <drivers/console.h>
 
 #include <arch/x86_64/gdt.h>
+#include <arch/x86_64/idt.h>
 
 // Set the base revision to 6, this is recommended as this is the latest
 // base revision described by the Limine boot protocol specification.
@@ -56,6 +57,8 @@ void kmain(void) {
     kprintf("serial: loaded\n");
     gdt_init();
     kprintf("gdt: loaded\n");
+    idt_init();
+    kprintf("idt: loaded\n");;
     // Ensure the bootloader actually understands our base revision (see spec).
     if (LIMINE_BASE_REVISION_SUPPORTED(limine_base_revision) == false) {
         serial_puts("kernel: framebuffer drawn, halting\n");
@@ -114,6 +117,11 @@ void kmain(void) {
     kprintf("\e[44mblue to end of line\e[K\e[0m\n");
     kprintf("\e[93;41mboth set\e[49m bg reset\e[39m fg reset\e[0m\n");
     kprintf("\e[0m");
-
+    // Deviding by 0 (Error Handling test)
+    #if 0
+    asm volatile("int3");
+    volatile int zero = 0;
+    volatile int x = 10 / zero;
+    #endif
     hcf();
 }
