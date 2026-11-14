@@ -12,6 +12,8 @@ rendering path (`wl_shm`): clients draw into shared memory and hand the buffer
 to the compositor, so no GPU driver is needed. A native toolkit will be built
 alongside it, so the desktop is usable long before GTK or Qt can be ported.
 
+![GyozaOS in QEMU: the framebuffer console with ANSI colours, and keyboard input echoed back](docs/screenshot.png)
+
 ## Status
 
 | Milestone | State |
@@ -19,8 +21,8 @@ alongside it, so the desktop is usable long before GTK or Qt can be ported.
 | 1 — Serial + framebuffer text | done |
 | 2 — GDT and TSS | done |
 | 3 — IDT and exceptions | done |
-| 4 — Interrupt controller, timer, keyboard | in progress |
-| 5–6 — Physical and virtual memory | |
+| 4 — Interrupt controller, timer, keyboard | done |
+| 5–6 — Physical and virtual memory | next |
 | 7 — Multitasking | |
 | 8 — User mode and system calls | |
 | 9 — Filesystem | |
@@ -43,6 +45,12 @@ What works today:
   none), a shared save/restore path, and a C handler that prints a full
   register dump (plus CR2 on page faults) instead of triple-faulting;
   breakpoints (`int3`) resume execution
+- **Hardware interrupts** — the legacy 8259 PIC remapped to vectors 32–47, with
+  per-IRQ handler registration and end-of-interrupt handling
+- **PIT timer** — programmable tick rate (100 Hz by default), a tick counter and
+  a `hlt`-based millisecond sleep
+- **PS/2 keyboard** — scancode set 1 translated to characters (US layout, Shift
+  supported) and queued in a ring buffer between the IRQ handler and the kernel
 
 ## Building
 
@@ -51,10 +59,10 @@ On an x86-64 Linux host the system `gcc` is sufficient — no cross-compiler nee
 
 ```sh
 # Arch
-sudo pacman -S --needed base-devel git xorriso qemu-system-x86 qemu-ui-gtk gdb
+sudo pacman -S --needed base-devel git xorriso qemu-system-x86 qemu-ui-sdl gdb
 
 # Debian / Ubuntu
-sudo apt install -y build-essential git xorriso qemu-system-x86 gdb
+sudo apt install -y build-essential git xorriso qemu-system-x86 qemu-system-gui gdb
 ```
 
 ```sh
@@ -79,8 +87,8 @@ gdb kernel/bin/kernel
 ```
 kernel/src/
 ├── main.c              kernel entry point
-├── arch/x86_64/        CPU-specific: GDT, IDT, ISR stubs, port I/O, control registers
-├── drivers/            serial, framebuffer graphics, text console, font data
+├── arch/x86_64/        CPU-specific: GDT, IDT, ISR stubs, PIC, port I/O, control registers
+├── drivers/            serial, framebuffer graphics, text console, font data, PIT timer, PS/2 keyboard
 └── lib/                printf, string routines
 tools/
 └── psf2c.py            converts a PSF2 console font into a C header
