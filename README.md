@@ -4,8 +4,7 @@ A hobby operating system written from scratch in C for x86-64, booted by
 [Limine](https://github.com/limine-bootloader/limine).
 
 The goal is a complete system — kernel, userland, and its own GUI — that can run
-Linux applications. In the spirit of SerenityOS, software first runs by being
-compiled *for* GyozaOS; running unmodified Linux binaries is a later layer at
+Linux applications. Software first runs by being compiled *for* GyozaOS; running unmodified Linux binaries is a later layer at
 the system-call boundary, not a different kernel.
 
 The display server will speak the **Wayland** protocol over its software
