@@ -13,8 +13,8 @@ unmodified Linux binaries is a distant north star, not a near-term milestone.
 |---|---|
 | 1 — Serial + framebuffer text | done |
 | 2 — GDT and TSS | done |
-| 3 — IDT and exceptions | in progress |
-| 4 — Interrupt controller, timer, keyboard | |
+| 3 — IDT and exceptions | done |
+| 4 — Interrupt controller, timer, keyboard | in progress |
 | 5–6 — Physical and virtual memory | |
 | 7 — Multitasking | |
 | 8 — User mode and system calls | |
@@ -33,6 +33,11 @@ What works today:
   erase-in-line, erase-in-display, and cursor positioning
 - **GDT and TSS** — kernel and user descriptors laid out for `syscall`/`sysret`,
   loaded with a far return, plus a 64-bit TSS
+- **IDT and exception handling** — assembly entry stubs for all 32 CPU
+  exceptions that normalise the stack (fake error code where the CPU pushes
+  none), a shared save/restore path, and a C handler that prints a full
+  register dump (plus CR2 on page faults) instead of triple-faulting;
+  breakpoints (`int3`) resume execution
 
 ## Building
 
@@ -69,7 +74,7 @@ gdb kernel/bin/kernel
 ```
 kernel/src/
 ├── main.c              kernel entry point
-├── arch/x86_64/        CPU-specific: GDT, IDT, port I/O, control registers
+├── arch/x86_64/        CPU-specific: GDT, IDT, ISR stubs, port I/O, control registers
 ├── drivers/            serial, framebuffer graphics, text console, font data
 └── lib/                printf, string routines
 tools/
