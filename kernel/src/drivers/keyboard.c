@@ -16,8 +16,6 @@
 
 #define KEYMAP_SIZE 0x57    // big enough to reach the < > key at 0x56
 
-// Scancode -> character, French AZERTY. 0 = no character.
-// The position in the array is the scancode: index 0x10 is the 'a' key.
 static const char normal_map[KEYMAP_SIZE] = {
     0,    27,  '&', 0,   '"', '\'', '(', '-', 0,   '_', 0,   0,   ')', '=', '\b',
     '\t', 'a', 'z', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '^', '$', '\n',
@@ -112,7 +110,7 @@ void keyboard_init(void) {
 
 int keyboard_getchar(void) {
     if (tail == head) {
-        return -1;              // nothing typed yet
+        return -1;
     }
     char c = buffer[tail];
     tail = (tail + 1) % BUFFER_SIZE;

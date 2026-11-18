@@ -57,7 +57,6 @@ void serial_putc(char c) {
     }
 
     while (!transmit_empty()) {
-        // Busy-wait. At these speeds it costs nothing worth optimising.
     }
 
     outb(COM1_BASE + SERIAL_DATA, (uint8_t)c);
